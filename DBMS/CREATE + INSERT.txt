@@ -1,0 +1,133 @@
+CREATE TABLE Airline
+(
+name varchar(20) NOT NULL,
+year_founded int,
+lounge varchar(30),
+hub varchar(20),
+registration_no int NOT NULL,
+PRIMARY KEY (registration_no)
+);
+
+CREATE TABLE Airplane
+(
+ type varchar(20) NOT NULL,
+ model_no int AUTO_INCREMENT,
+ airspeed int NOT NULL,
+ weight int NOT NULL,
+ reg_no int,
+PRIMARY KEY(model_no),
+CONSTRAINT regconstraint
+FOREIGN KEY(reg_no) REFERENCES Airline(registration_no)
+on delete set null on update cascade
+);
+
+CREATE TABLE Employee
+(
+  name varchar(20) NOT NULL,
+  gender varchar(10) NOT NULL,
+  salary int,
+  CHECK(salary>0),
+  work_exp int,
+  address varchar(50),
+  contact_no int,
+  designation varchar(20),
+  ssn int NOT NULL,
+  reg_no1 int,
+  PRIMARY KEY(ssn),
+  FOREIGN KEY(reg_no1) REFERENCES Airline(registration_no),
+  CHECK (gender IN('Male','Female'))
+);
+
+CREATE TABLE Customer
+(
+  fname varchar(10) NOT NULL,
+  mname varchar(10) NOT NULL,
+  lname varchar(10) NOT NULL,
+  b_date Date,
+  email_id varchar(20),
+  ticket_no varchar(20) NOT NULL,
+  reg_no2 int,
+  PRIMARY KEY(ticket_no),
+  FOREIGN KEY(reg_no2) REFERENCES Airline(registration_no)
+);
+
+CREATE TABLE contact_no
+(
+ ticket_no varchar(20) NOT NULL,
+ contact int,
+ PRIMARY KEY(ticket_no,contact),
+ FOREIGN KEY(ticket_no) REFERENCES Customer(ticket_no)
+);
+
+CREATE TABLE Frequent_Flyer
+(
+ card_id int NOT NULL,
+ premium_class varchar(20),
+ ticket_no varchar(20),
+ PRIMARY KEY(ticket_no),
+ FOREIGN KEY(ticket_no) REFERENCES Customer(ticket_no)
+);
+
+CREATE TABLE Non_Frequent_Flyer
+(
+ voucher_id int,
+ ticket_no varchar(20),
+ PRIMARY KEY(ticket_no),
+ FOREIGN KEY(ticket_no) REFERENCES Customer(ticket_no)
+); 
+
+INSERT INTO Airline
+VALUES('Emirates' , 1985 , 'Emirates Lounge' , 'Dubai', 1),
+('British Airways' , 1974  , 'British Airways Lounge' , 'London' , 2),
+('Turkish Airlines' , 1933 , 'Turkish Airlines CIP Lounge' , 'Istanbul,3),
+('Cathay Pacific' , 1946 , 'The Bridge' , 'Hong Kong' , 4),
+('Air India' , 1932 , 'Maharaja Lounge' , 'Delhi' , 5);
+
+INSERT INTO Airplane
+VALUES('Boeing 747' , NULL , 950 , 10000,NULL),
+('Boeing 777' , NULL  , 1000 , 9000 , 2),
+('Airbus A360' , NULL , 1100 , 11000, 3),
+('Airbus A380' , NULL , 1200 , 12000 , 4),
+('Boeing 737' , NULL , 900 , 8500 , 5);
+
+INSERT INTO Employee(address,gender,salary,work_exp,contact_no,designation,ssn,name,reg_no1)
+VALUES( NULL , 'Male' , 1000 , 3 , 991234, 'Developer', 444,'Sagar',NULL),
+(NULL , 'Female' , 2000 , 3 , 92313, 'Designer', 111, 'Deepika', 2),
+(NULL , 'Female' , 3000 , 4 , 92312, 'Manager',  222, 'Alia', 1),
+(NULL , 'Male'   , 4000 , 4 , 923213,'Engineer', 333, 'Rohan', 1),
+(NULL , 'Male'   , 5000 , 4 , 92323, 'Analyst',  555, 'Manan', 3);
+
+INSERT INTO Customer
+VALUES('Virat','Alabh','Kohli', '1988-11-11' , 'vkohli@gmail.com'  , 'abc123' , 5),
+('Mahendra','Singh','Dhoni'   , '1989-11-09' , 'msdhoni@gmail.com' , 'xyz123' , 4),  
+('Suresh','Sachin','Raina'    , '1989-01-29' , 'sraina@gmail.com'  , 'pqr123' , NULL),  
+('Ravi','Shashtri','Ashwin'   , NULL         , 'rashwin@gmail.com' , 'abc456' , 3),
+('Shikhar','Avasyu','Dhawan'  , NULL         , 'sdhawan@gmail.com' , 'xyz456' , NULL);
+
+INSERT INTO contact_no
+VALUES('abc123' , 99212),
+('abc123' , 98212),
+('abc456' , 97212),
+('xyz456' , 96212),
+('xyz123' , 95212);
+
+INSERT INTO Frequent_Flyer
+VALUES(123450,'Silver','abc123'),
+(123451,'Gold','pqr123'),
+(123452,'Blue','abc456'),
+(123453,'Platinum','xyz456'),
+(123454,'Platinum','xyz123');
+
+INSERT INTO Non_Frequent_Flyer
+VALUES(NULL , 'xyz123'),
+(9876 , 'pqr123'),
+(9875 , 'abc456'),
+(NULL , 'xyz456'),
+(9874 , 'abc123');
+
+CREATE VIEW Employee_temp
+(`EName`, `Address`, `Salary`, `Registration Number` , `Airline`)
+AS SELECT Employee.name, address, salary, reg_no1 , Airline.name
+FROM Employee , Airline
+WHERE reg_no1=registration_no
+GROUP BY reg_no1;

@@ -1,0 +1,42 @@
+CREATE TABLE emp
+(eno int NOT NULL,
+ pno int,
+ hrs int,
+ PRIMARY KEY(eno));
+
+CREATE TABLE project
+(pno int NOT NULL,
+ thrs int,
+ hold_no int,
+ PRIMARY KEY(pno),
+ FOREIGN KEY(hold_no) REFERENCES emp(eno));
+ 
+INSERT INTO emp
+VALUES(1,111,10),
+(2,222,20);
+
+INSERT INTO project
+VALUES(111,10,1),
+(222,20,2);
+
+delimiter //
+CREATE TRIGGER employee
+AFTER UPDATE ON emp
+FOR EACH ROW
+IF(new.pno IS NOT NULL)
+THEN
+UPDATE project
+SET thrs=thrs+new.hrs
+WHERE new.pno = pno;
+UPDATE project
+SET thrs=thrs-old.hrs
+WHERE old.pno = pno;
+END IF;
+//
+
+UPDATE emp
+SET pno = 111
+WHERE eno = 2;
+
+Above statement will make pno of 222 to be 111 i.e 2nd value in emp.
+Hence thrs for that corresponding value in project table should be 20 as initially it was 0.
